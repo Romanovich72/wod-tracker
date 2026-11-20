@@ -12,13 +12,13 @@ export function renderWorkoutCard(record: WorkoutRecord, format: ShareFormat) {
   const context = canvas.getContext('2d');
   if (!context) return '';
   const ctx = context;
-  ctx.fillStyle = '#0F1115';
+  ctx.fillStyle = '#0B0E14';
   ctx.fillRect(0, 0, width, height);
 
   const glow = ctx.createRadialGradient(width * 0.78, height * 0.2, 0, width * 0.65, height * 0.26, width * 0.78);
   glow.addColorStop(0, 'rgba(125, 171, 43, 0.24)');
   glow.addColorStop(0.48, 'rgba(59, 78, 33, 0.10)');
-  glow.addColorStop(1, 'rgba(15, 17, 21, 0)');
+  glow.addColorStop(1, 'rgba(11, 14, 20, 0)');
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
 
