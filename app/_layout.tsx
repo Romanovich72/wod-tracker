@@ -1,56 +1,26 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  anchor: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { Stack } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+import { WorkoutHistoryProvider } from '@/components/WorkoutHistoryContext';
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
+  const [fontsReady] = useFonts(Ionicons.font);
+  if (!fontsReady) return null;
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <WorkoutHistoryProvider>
+      <View style={styles.canvas}>
+        <View style={styles.app}>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0F1115' } }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </View>
+      </View>
+    </WorkoutHistoryProvider>
   );
 }
+const styles = StyleSheet.create({
+  canvas: { flex: 1, width: '100%', alignItems: 'center', backgroundColor: '#080A0E' },
+  app: { width: '100%', maxWidth: 430, flex: 1, backgroundColor: '#0F1115' },
+});
