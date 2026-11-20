@@ -34,7 +34,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:web": "C:\\Users\\p.arinin\\nodejs\\npx.cmd expo export --platform web && C:\\Users\\p.arinin\\nodejs\\node.exe -e \"const fs=require('node:fs');fs.copyFileSync('dist/index.html','dist/404.html');fs.writeFileSync('dist/.nojekyll','')\""
   },
   "private": true
 }
