@@ -21,7 +21,7 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  scene: { backgroundColor: '#0F1115' },
+  scene: { backgroundColor: '#0B0E14' },
   bar: {
     backgroundColor: '#14171D',
     borderTopColor: '#292E37',

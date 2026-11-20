@@ -9,6 +9,7 @@ type HistoryContextValue = {
   loaded: boolean;
   addRecord: (record: WorkoutRecord) => void;
   removeRecord: (id: string) => void;
+  replaceRecords: (records: WorkoutRecord[]) => void;
 };
 const HistoryContext = createContext<HistoryContextValue | null>(null);
 
@@ -31,7 +32,8 @@ export function WorkoutHistoryProvider({ children }: { children: React.ReactNode
 
   const addRecord = useCallback((record: WorkoutRecord) => setRecords((current) => [record, ...current]), []);
   const removeRecord = useCallback((id: string) => setRecords((current) => current.filter((record) => record.id !== id)), []);
-  const value = useMemo(() => ({ records, loaded, addRecord, removeRecord }), [records, loaded, addRecord, removeRecord]);
+  const replaceRecords = useCallback((nextRecords: WorkoutRecord[]) => setRecords(nextRecords), []);
+  const value = useMemo(() => ({ records, loaded, addRecord, removeRecord, replaceRecords }), [records, loaded, addRecord, removeRecord, replaceRecords]);
 
   return <HistoryContext.Provider value={value}>{children}</HistoryContext.Provider>;
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import AppIcon from '@/components/AppIcon';
 import { playWodAudio, prepareWodAudio } from '@/components/wodAudio';
 import { useWorkoutHistory } from '@/components/WorkoutHistoryContext';
@@ -113,6 +113,38 @@ export default function WodTimerScreen() {
     }, 1000);
     return () => clearTimeout(timeout);
   }, [countdown, soundEnabled]);
+
+  useEffect(() => {
+    if (!running || Platform.OS !== 'web' || typeof document === 'undefined' || typeof navigator === 'undefined') return;
+    type WakeLock = { released: boolean; release: () => Promise<void> };
+    type WakeLockNavigator = Navigator & { wakeLock?: { request: (type: 'screen') => Promise<WakeLock> } };
+    const wakeLockApi = (navigator as WakeLockNavigator).wakeLock;
+    if (!wakeLockApi) return;
+
+    let disposed = false;
+    let sentinel: WakeLock | null = null;
+    const acquire = async () => {
+      if (disposed || document.visibilityState !== 'visible' || (sentinel && !sentinel.released)) return;
+      try {
+        const nextSentinel = await wakeLockApi.request('screen');
+        if (disposed) await nextSentinel.release();
+        else sentinel = nextSentinel;
+      } catch {
+        sentinel = null;
+      }
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && (!sentinel || sentinel.released)) void acquire();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    void acquire();
+    return () => {
+      disposed = true;
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (sentinel && !sentinel.released) void sentinel.release();
+      sentinel = null;
+    };
+  }, [running]);
 
   useEffect(() => {
     if (!running) return;
@@ -319,7 +351,7 @@ function formatTime(seconds: number) {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0F1115' },
+  root: { flex: 1, backgroundColor: '#0B0E14' },
   content: { width: '100%', maxWidth: 430, alignSelf: 'center', paddingHorizontal: 22, paddingTop: 23, paddingBottom: 28 },
   topline: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 },
   kicker: { color: '#9AA3AF', fontSize: 9, letterSpacing: 1.55, fontWeight: '800', marginBottom: 6 },
